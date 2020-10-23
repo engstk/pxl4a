@@ -2043,11 +2043,8 @@ void rmnet_shs_wq_process_wq(struct work_struct *work)
         rmnet_shs_wq_cleanup_hash_tbl(PERIODIC_CLEAN);
         rmnet_shs_wq_debug_print_flows();
 
-<<<<<<< HEAD
-=======
 	jiffies = msecs_to_jiffies(rmnet_shs_wq_interval_ms);
 
->>>>>>> LA.UM.9.1.R1.10.00.00.604.038
 	queue_delayed_work(rmnet_shs_wq, &rmnet_shs_delayed_wq->wq,
 			   jiffies);
 
