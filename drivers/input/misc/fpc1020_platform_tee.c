@@ -35,6 +35,15 @@
 #include <linux/platform_device.h>
 #include <linux/regulator/consumer.h>
 
+#ifdef CONFIG_FPR_HAPTIC_FEEDBACK_DISABLE
+#include <linux/moduleparam.h>
+
+static bool haptic_feedback_disable_fpr = false;
+module_param(haptic_feedback_disable_fpr, bool, 0644);
+
+void hap_ignore_next_request(void);
+#endif
+
 #define FPC_TTW_HOLD_TIME 3000
 
 #define RESET_LOW_SLEEP_MIN_US 5000
@@ -445,6 +454,10 @@ static irqreturn_t fpc1020_irq_handler(int irq, void *handle)
 
 	if (atomic_read(&fpc1020->wakeup_enabled)) {
 		__pm_wakeup_event(&fpc1020->ttw_ws, FPC_TTW_HOLD_TIME);
+#ifdef CONFIG_FPR_HAPTIC_FEEDBACK_DISABLE
+		if (haptic_feedback_disable_fpr)
+			hap_ignore_next_request();
+#endif
 	}
 
 	sysfs_notify(&fpc1020->dev->kobj, NULL, dev_attr_irq.attr.name);
