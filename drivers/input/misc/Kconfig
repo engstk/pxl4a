@@ -908,6 +908,10 @@ config HAPTIC_FEEDBACK_LEVEL
 	bool "Export haptic feedback level"
 	default y
 
+config FPR_HAPTIC_FEEDBACK_DISABLE
+	bool "Export FPR haptic feedback control"
+	default y
+
 endif
 
 source "drivers/input/misc/lm36011/Kconfig"

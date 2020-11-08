@@ -52,6 +52,15 @@ static bool disable_vib = false;
 static int level = 100;
 #endif
 
+#ifdef CONFIG_FPR_HAPTIC_FEEDBACK_DISABLE
+static bool ignore_next_request = false;
+
+inline void hap_ignore_next_request(void)
+{
+    ignore_next_request = true;
+}
+#endif
+
 static struct drv2624_data *drv2624_plat_data;
 
 static bool drv2624_is_volatile_reg(struct device *dev, unsigned int reg);
@@ -299,6 +308,12 @@ static void vibrator_enable(
 {
 	struct drv2624_data *drv2624 =
 		container_of(led_cdev, struct drv2624_data, led_dev);
+#ifdef CONFIG_FPR_HAPTIC_FEEDBACK_DISABLE
+	if (ignore_next_request) {
+		value = LED_OFF;
+		ignore_next_request = false;
+	}
+#endif
 #ifdef CONFIG_HAPTIC_FEEDBACK_LEVEL
 	if (value == LED_OFF || disable_vib)
 #else
