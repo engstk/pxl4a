@@ -904,6 +904,10 @@ config FPC_FINGERPRINT
     default n
     tristate "fpc1020 fingerprint driver"
 
+config HAPTIC_FEEDBACK_LEVEL
+	bool "Export haptic feedback level"
+	default y
+
 endif
 
 source "drivers/input/misc/lm36011/Kconfig"
