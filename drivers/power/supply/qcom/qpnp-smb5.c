@@ -248,10 +248,7 @@ struct smb5 {
 };
 
 /* All flags turned on */
-static int __debug_mask = -1;
-module_param_named(
-	debug_mask, __debug_mask, int, 0600
-);
+static int __debug_mask = 0;
 
 static int __pd_disabled;
 module_param_named(
