@@ -41,7 +41,7 @@
 static bool haptic_feedback_disable_fpr = false;
 module_param(haptic_feedback_disable_fpr, bool, 0644);
 
-inline void hap_ignore_next_request(void);
+void hap_ignore_next_request(void);
 #endif
 
 #define FPC_TTW_HOLD_TIME 3000
