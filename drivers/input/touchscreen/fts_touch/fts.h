@@ -32,10 +32,8 @@
 #ifndef _LINUX_FTS_I2C_H_
 #define _LINUX_FTS_I2C_H_
 
-#define TOUCHSCREEN_HEATMAP
-
 #include <linux/device.h>
-#ifdef TOUCHSCREEN_HEATMAP
+#ifdef CONFIG_TOUCHSCREEN_HEATMAP
 #include <linux/input/heatmap.h>
 #endif
 #include <linux/pm_qos.h>
@@ -205,7 +203,7 @@
 
 /**@}*/
 /*********************************************************/
-#ifdef TOUCHSCREEN_HEATMAP
+#ifdef CONFIG_TOUCHSCREEN_HEATMAP
 /* **** LOCAL HEATMAP FEATURE *** */
 #define LOCAL_HEATMAP_WIDTH 7
 #define LOCAL_HEATMAP_HEIGHT 7
@@ -290,7 +288,7 @@ struct fts_hw_platform_data {
 	int x_axis_max;
 	int y_axis_max;
 	bool auto_fw_update;
-#ifdef TOUCHSCREEN_HEATMAP
+#ifdef CONFIG_TOUCHSCREEN_HEATMAP
 	bool heatmap_mode_full_init;
 #endif
 	struct drm_panel *panel;
@@ -324,7 +322,7 @@ typedef enum {
  *			(LOCAL_HEATMAP_WIDTH * LOCAL_HEATMAP_HEIGHT)
  * FTS_HEATMAP_FULL	- read full mutual sense strength frame
  */
-#ifdef TOUCHSCREEN_HEATMAP
+#ifdef CONFIG_TOUCHSCREEN_HEATMAP
 enum {
 	FTS_HEATMAP_OFF		= 0,
 	FTS_HEATMAP_PARTIAL	= 1,
@@ -405,7 +403,7 @@ struct fts_ts_info {
 	struct completion bus_resumed;		/* resume_work complete */
 
 	struct pm_qos_request pm_qos_req;
-#ifdef TOUCHSCREEN_HEATMAP
+#ifdef CONFIG_TOUCHSCREEN_HEATMAP
 	struct v4l2_heatmap v4l2;
 #endif
 	struct delayed_work fwu_work;	/* Work for fw update */
@@ -460,7 +458,7 @@ struct fts_ts_info {
 	int stylus_enabled;	/* Stylus mode */
 	int cover_enabled;	/* Cover mode */
 	int grip_enabled;	/* Grip mode */
-#ifdef TOUCHSCREEN_HEATMAP
+#ifdef CONFIG_TOUCHSCREEN_HEATMAP
 	int heatmap_mode;	/* heatmap mode*/
 #endif
 	/* Stop changing motion filter and keep fw design */
