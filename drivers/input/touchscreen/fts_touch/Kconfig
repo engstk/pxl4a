@@ -6,7 +6,6 @@ config TOUCHSCREEN_FTS
 	default y
 	tristate "STMicroelectronics multitouch touchscreen - FingerTipS (FTM5)"
 	depends on SPI
-	select TOUCHSCREEN_HEATMAP
 	help
 	  Say Y here to enable STMicroelectronics (FTM5) touchscreen support.
 	  If unsure, say N.
