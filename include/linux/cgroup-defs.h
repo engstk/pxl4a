@@ -64,6 +64,12 @@ enum {
 	 * specified at mount time and thus is implemented here.
 	 */
 	CGRP_CPUSET_CLONE_CHILDREN,
+
+	/* Control group has to be frozen. */
+	CGRP_FREEZE,
+
+	/* Cgroup is frozen. */
+	CGRP_FROZEN,
 };
 
 /* cgroup_root->flags */
@@ -258,6 +264,25 @@ struct css_set {
 	struct rcu_head rcu_head;
 };
 
+struct cgroup_freezer_state {
+	/* Should the cgroup and its descendants be frozen. */
+	bool freeze;
+
+	/* Should the cgroup actually be frozen? */
+	int e_freeze;
+
+	/* Fields below are protected by css_set_lock */
+
+	/* Number of frozen descendant cgroups */
+	int nr_frozen_descendants;
+
+	/*
+	 * Number of tasks, which are counted as frozen:
+	 * frozen, SIGSTOPped, and PTRACEd.
+	 */
+	int nr_frozen_tasks;
+};
+
 struct cgroup {
 	/* self css with NULL ->ss, points back to this cgroup */
 	struct cgroup_subsys_state self;
@@ -381,6 +406,9 @@ struct cgroup {
 
 	/* used to store eBPF programs */
 	struct cgroup_bpf bpf;
+
+	/* Used to store internal freezer state */
+	struct cgroup_freezer_state freezer;
 
 	/* ids of the ancestors at each level including self */
 	int ancestor_ids[];
@@ -519,7 +547,7 @@ struct cftype {
 
 /*
  * Control Group subsystem type.
- * See Documentation/cgroups/cgroups.txt for details
+ * See Documentation/cgroup-v1/cgroups.txt for details
  */
 struct cgroup_subsys {
 	struct cgroup_subsys_state *(*css_alloc)(struct cgroup_subsys_state *parent_css);
@@ -689,7 +717,9 @@ struct sock_cgroup_data {
 	union {
 #ifdef __LITTLE_ENDIAN
 		struct {
-			u8	is_data;
+			u8	is_data : 1;
+			u8	no_refcnt : 1;
+			u8	unused : 6;
 			u8	padding;
 			u16	prioidx;
 			u32	classid;
@@ -699,7 +729,9 @@ struct sock_cgroup_data {
 			u32	classid;
 			u16	prioidx;
 			u8	padding;
-			u8	is_data;
+			u8	unused : 6;
+			u8	no_refcnt : 1;
+			u8	is_data : 1;
 		} __packed;
 #endif
 		u64		val;
