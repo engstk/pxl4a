@@ -717,10 +717,6 @@ KBUILD_CFLAGS   += -O2
 endif
 
 ifdef CONFIG_CC_WERROR
-KBUILD_CFLAGS  += -Werror
-endif
-
-ifdef CONFIG_CC_WERROR
 KBUILD_CFLAGS	+= -Werror
 endif
 
