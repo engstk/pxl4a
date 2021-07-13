@@ -422,7 +422,7 @@ static void sm7150_get_batt_id(const struct bms_dev *bms, int *batt_id_ohm)
 
 	batt_id_mv = div_s64(batt_id_mv, 1000);
 	if (batt_id_mv == 0) {
-		pr_info("batt_id_mv = 0 from ADC\n");
+		pr_debug("batt_id_mv = 0 from ADC\n");
 		return;
 	}
 
@@ -433,7 +433,7 @@ static void sm7150_get_batt_id(const struct bms_dev *bms, int *batt_id_ohm)
 	}
 
 	*batt_id_ohm = div64_u64(BID_RPULL_OHM * 1000 + denom / 2, denom);
-	pr_info("batt_id = %d\n", *batt_id_ohm);
+	pr_debug("batt_id = %d\n", *batt_id_ohm);
 }
 
 #define QG_DATA_CTL2_REG			0x42
@@ -729,7 +729,7 @@ static int sm7150_get_batt_health(struct bms_dev *bms)
 			rc);
 		return POWER_SUPPLY_HEALTH_UNKNOWN;
 	}
-	pr_info("BATTERY_CHARGER_STATUS_2 = 0x%02x\n", stat);
+	pr_debug("BATTERY_CHARGER_STATUS_2 = 0x%02x\n", stat);
 
 	if (stat & CHG_ERR_STATUS_BAT_OV) {
 		rc = sm7150_get_battery_voltage(bms, &vchrg);
@@ -761,7 +761,7 @@ static int sm7150_get_batt_health(struct bms_dev *bms)
 			rc);
 		return POWER_SUPPLY_HEALTH_UNKNOWN;
 	}
-	pr_info("BATTERY_CHARGER_STATUS_7 = 0x%02x\n", stat);
+	pr_debug("BATTERY_CHARGER_STATUS_7 = 0x%02x\n", stat);
 	if (stat & BAT_TEMP_STATUS_TOO_COLD)
 		ret = POWER_SUPPLY_HEALTH_COLD;
 	else if (stat & BAT_TEMP_STATUS_TOO_HOT)
