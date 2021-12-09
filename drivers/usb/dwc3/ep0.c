@@ -106,6 +106,12 @@ static int __dwc3_gadget_ep0_queue(struct dwc3_ep *dep,
 {
 	struct dwc3		*dwc = dep->dwc;
 
+	if (req->request.status == -EINPROGRESS) {
+		dev_err(dwc->dev, "%s: %pK request already in queue", dep->name,
+			req);
+		return -EBUSY;
+	}
+
 	req->request.actual	= 0;
 	req->request.status	= -EINPROGRESS;
 	req->epnum		= dep->number;
@@ -329,6 +335,9 @@ static struct dwc3_ep *dwc3_wIndex_to_dep(struct dwc3 *dwc, __le16 wIndex_le)
 		epnum |= 1;
 
 	dep = dwc->eps[epnum];
+	if (dep == NULL)
+		return NULL;
+
 	if (dep->flags & DWC3_EP_ENABLED)
 		return dep;
 
