@@ -94,6 +94,7 @@
 	qcom,mdss-dsi-t-clk-pre = <0x33>;
 	qcom,platform-te-gpio = <&tlmm 10 0>;
 	qcom,platform-reset-gpio = <&pm6150l_gpios 9 0>;
+ 	qcom,ulps-enabled;
 	qcom,mdss-dsi-display-timings {
 		timing@0{
 			qcom,mdss-dsi-panel-phy-timings = [00 21 08 08 25 22 09
@@ -111,6 +112,7 @@
 	qcom,mdss-dsi-t-clk-pre = <0x36>;
 	qcom,platform-te-gpio = <&tlmm 10 0>;
 	qcom,platform-reset-gpio = <&pm6150l_gpios 9 0>;
+ 	qcom,ulps-enabled;
 	qcom,mdss-dsi-display-timings {
 		timing@0{
 			qcom,mdss-dsi-panel-phy-timings = [00 24 09 0A 26 24 09
