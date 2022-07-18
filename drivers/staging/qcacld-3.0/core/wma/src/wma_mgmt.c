@@ -1175,6 +1175,36 @@ static void wma_objmgr_set_peer_mlme_phymode(tp_wma_handle wma,
 }
 
 /**
+ * wma_objmgr_set_peer_mlme_type() - set peer type to peer object
+ * @wma:      wma handle
+ * @mac_addr: mac addr of peer
+ * @peer_type:  peer type value to set
+ *
+ * Return: None
+ */
+static void wma_objmgr_set_peer_mlme_type(tp_wma_handle wma,
+					  uint8_t *mac_addr,
+					  enum wlan_peer_type peer_type)
+{
+	uint8_t pdev_id;
+	struct wlan_objmgr_peer *peer;
+	struct wlan_objmgr_psoc *psoc = wma->psoc;
+
+	pdev_id = wlan_objmgr_pdev_get_pdev_id(wma->pdev);
+	peer = wlan_objmgr_get_peer(psoc, pdev_id, mac_addr,
+				    WLAN_LEGACY_WMA_ID);
+	if (!peer) {
+		WMA_LOGE(FL("peer object null"));
+		return;
+	}
+
+	wlan_peer_obj_lock(peer);
+	wlan_peer_set_peer_type(peer, peer_type);
+	wlan_peer_obj_unlock(peer);
+	wlan_objmgr_peer_release_ref(peer, WLAN_LEGACY_WMA_ID);
+}
+
+/**
  * wmi_unified_send_peer_assoc() - send peer assoc command to fw
  * @wma: wma handle
  * @nw_type: nw type
@@ -1365,8 +1395,11 @@ QDF_STATUS wma_send_peer_assoc(tp_wma_handle wma,
 		cmd->peer_flags |= WMI_PEER_160MHZ;
 
 	cmd->peer_vht_caps = params->vht_caps;
-	if (params->p2pCapableSta)
+	if (params->p2pCapableSta) {
 		cmd->peer_flags |= WMI_PEER_IS_P2P_CAPABLE;
+		wma_objmgr_set_peer_mlme_type(wma, params->staMac,
+					      WLAN_PEER_P2P_CLI);
+	}
 
 	if (params->rmfEnabled)
 		cmd->peer_flags |= WMI_PEER_PMF;
@@ -2622,8 +2655,22 @@ static QDF_STATUS wma_unified_bcn_tmpl_send(tp_wma_handle wma,
 		tmpl_len = *(uint32_t *) &bcn_info->beacon[0];
 	else
 		tmpl_len = bcn_info->beaconLength;
-	if (p2p_ie_len)
+
+	if (tmpl_len > WMI_BEACON_TX_BUFFER_SIZE) {
+		wma_err("tmpl_len: %d > %d. Invalid tmpl len", tmpl_len,
+			WMI_BEACON_TX_BUFFER_SIZE);
+		return -EINVAL;
+	}
+
+	if (p2p_ie_len) {
+		if (tmpl_len <= p2p_ie_len) {
+			wma_err("tmpl_len %d <= p2p_ie_len %d, Invalid",
+				tmpl_len, p2p_ie_len);
+			return -EINVAL;
+		}
 		tmpl_len -= (uint32_t) p2p_ie_len;
+	}
+
 	frm = bcn_info->beacon + bytes_to_strip;
 	tmpl_len_aligned = roundup(tmpl_len, sizeof(A_UINT32));
 	/*
